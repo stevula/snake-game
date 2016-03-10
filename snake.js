@@ -1,6 +1,39 @@
-var snake = [{top: 0, left: 0}],
-    apple = [{top: 5, left: 5}, {top: 5, left: 6}],
-    drawableSnake = {color: "green", pixels: snake},
-    drawableApple = {color: "red", pixels: apple},
-    drawableObjects = [drawableSnake, drawableApple];
-CHUNK.draw(drawableObjects);
+var drawSnake = function(snake) {
+    var drawableSnake = {color: "green", pixels: snake},
+        drawableObjects = [drawableSnake];
+    CHUNK.draw(drawableObjects);
+};
+
+var moveSnake = function(snake) {
+    var oldSegment = snake[0],
+        newSegment = moveSegment(oldSegment);
+    newSegment.direction = oldSegment.direction;
+    return [newSegment];
+};
+
+var advanceGame = function() {
+    snake = moveSnake(snake);
+    drawSnake(snake);
+};
+
+var moveSegment = function(segment) {
+    if (segment.direction === "down") {
+        return {top: segment.top + 1, left: segment.left};
+    }
+    else if (segment.direction === "up") {
+        return {top: segment.top - 1, left: segment.left};
+    }
+    else if (segment.direction === "right") {
+        return {top: segment.top, left: segment.left + 1};
+    }
+    else if (segment.direction === "left") {
+        return {top: segment.top, left: segment.left - 1};
+    }
+    return segment;
+};
+
+var snake = [{top: 1, left: 1, direction: "down"}],
+    apple = [{top: 5, left: 10}],
+    drawableApple = {color: "red", pixels: apple};
+
+CHUNK.executeNTimesPerSecond(advanceGame, 2);
