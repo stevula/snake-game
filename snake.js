@@ -29,15 +29,21 @@ var moveSnake = function(snake) {
 };
 
 var advanceGame = function() {
-    snake = moveSnake(snake);
-    if (CHUNK.detectCollisionBetween([apple], snake)) {
-        snake = growSnake(snake);
+    var newSnake = moveSnake(snake);
+    if (ate(newSnake, snake)) {
+        CHUNK.endGame();
+        CHUNK.flashMessage("Congrats! You ate yourself.");
+    }
+
+    if (ate(newSnake, [apple])) {
+        newSnake = growSnake(newSnake);
         apple = CHUNK.randomLocation();
     }
-    if (CHUNK.detectCollisionBetween(snake, CHUNK.gameBoundaries())) {
+    if (ate(newSnake, CHUNK.gameBoundaries())) {
         CHUNK.endGame();
-        CHUNK.flashMessage("You died.");
+        CHUNK.flashMessage("Please don't eat the wall.");
     }
+    snake = newSnake;
     draw(snake, apple);
 };
 
@@ -59,6 +65,11 @@ var growSnake = function(snake) {
         lastSegment = snake[indexOfLastSegment];
     snake.push({top: lastSegment.top, left: lastSegment.left});
     return snake;
+};
+
+var ate = function(snake, otherThing) {
+    var head = snake[0];
+    return CHUNK.detectCollisionBetween([head], otherThing);
 };
 
 var snake = [{top: 1, left: 1, direction: "down"}, {top: 0, left: 1, direction: "down"}],
